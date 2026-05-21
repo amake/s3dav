@@ -81,7 +81,52 @@ dart analyze
 
 The repository includes:
 
-- [Dockerfile](Dockerfile) for a Lambda container image
+- ZIP-based Lambda packaging through [Makefile](Makefile)
+- deploy defaults through [deploy.env.example](deploy.env.example)
 - [infra/template.yaml](infra/template.yaml) as CloudFormation/SAM-style infrastructure scaffolding
 
 The Lambda entrypoint is [bin/bootstrap.dart](bin/bootstrap.dart), which runs a custom runtime loop and converts API Gateway HTTP API v2 events into service requests.
+
+Build the Lambda payload with:
+
+```sh
+make build
+```
+
+This produces `dist/lambda.zip` containing the compiled `bootstrap` binary for the AWS `provided.al2023` custom runtime.
+
+For deployment, copy [deploy.env.example](deploy.env.example) to `deploy.env` and fill it out once:
+
+```sh
+cp deploy.env.example deploy.env
+```
+
+Then deploy with:
+
+```sh
+make deploy
+```
+
+You can inspect the resolved deploy settings with:
+
+```sh
+make show-config
+```
+
+You can still override any setting on the command line when needed:
+
+```sh
+make deploy \
+  artifact_bucket=some-other-bucket \
+  domain_name=staging.example.com
+```
+
+Optional deploy variables:
+
+- `stack_name` defaults to `dav-s3-gateway`
+- `service_name` defaults to `dav-s3-gateway`
+- `artifact_key` defaults to `<service_name>/lambda.zip`
+- `hosted_zone_id` is optional; leave it unset if DNS is managed elsewhere
+- `max_object_size_bytes` defaults to `5242880`
+
+`make deploy` builds the ZIP, uploads it to `s3://<artifact_bucket>/<artifact_key>`, and runs `aws cloudformation deploy` against [infra/template.yaml](infra/template.yaml).

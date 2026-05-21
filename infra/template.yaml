@@ -5,7 +5,9 @@ Parameters:
   ServiceName:
     Type: String
     Default: dav-s3-gateway
-  ImageUri:
+  ArtifactBucket:
+    Type: String
+  ArtifactKey:
     Type: String
   DomainName:
     Type: String
@@ -58,9 +60,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Ref ServiceName
-      PackageType: Image
+      Runtime: provided.al2023
+      Handler: bootstrap
+      Architectures:
+        - arm64
       Code:
-        ImageUri: !Ref ImageUri
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref ArtifactKey
       Role: !GetAtt GatewayFunctionRole.Arn
       MemorySize: 256
       Timeout: 30
