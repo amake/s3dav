@@ -158,3 +158,9 @@ Outputs:
     Value: !GetAtt HttpApi.ApiEndpoint
   CustomDomain:
     Value: !Ref DomainName
+  CustomDomainTarget:
+    Description: DNS target for CNAME/ALIAS records managed outside this stack.
+    Value: !GetAtt Domain.RegionalDomainName
+  CustomDomainHostedZoneId:
+    Description: Route 53 hosted zone ID for an alias record to the API Gateway regional domain.
+    Value: !GetAtt Domain.RegionalHostedZoneId

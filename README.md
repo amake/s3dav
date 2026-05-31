@@ -136,3 +136,5 @@ Optional deploy variables:
 `make deploy` validates that the region in `certificate_arn` matches `aws_region` before calling CloudFormation.
 
 `make deploy` builds the ZIP, uploads it to `s3://<artifact_bucket>/<artifact_key>`, and runs `aws cloudformation deploy --region <aws_region>` against [infra/template.yaml](infra/template.yaml). The Lambda stack and API Gateway live in `aws_region`; object reads and writes are signed for `s3_region`.
+
+If DNS is managed outside this stack, create a DNS record for `domain_name` that points at the `CustomDomainTarget` stack output. For a subdomain such as `dav.example.com`, use a `CNAME` record. If your DNS provider supports alias-style records at the zone apex, use `CustomDomainTarget` plus `CustomDomainHostedZoneId`.
