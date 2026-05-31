@@ -89,7 +89,10 @@ final class S3ObjectStore implements ObjectStore {
       method: 'PUT',
       key: key,
       body: bytes,
-      extraHeaders: {HttpHeaders.contentTypeHeader: contentType},
+      extraHeaders: {
+        HttpHeaders.contentLengthHeader: bytes.length.toString(),
+        HttpHeaders.contentTypeHeader: contentType,
+      },
     );
     if (response.statusCode != 200) {
       final errorBody = utf8.decode(
@@ -132,7 +135,18 @@ final class S3ObjectStore implements ObjectStore {
     );
     headers['authorization'] = authorization;
 
-    headers.forEach(request.headers.set);
+    final contentLength = int.tryParse(
+      headers[HttpHeaders.contentLengthHeader] ?? '',
+    );
+    if (contentLength != null) {
+      request.contentLength = contentLength;
+      request.headers.chunkedTransferEncoding = false;
+    }
+    headers.forEach((name, value) {
+      if (name != HttpHeaders.contentLengthHeader) {
+        request.headers.set(name, value);
+      }
+    });
     if (body.isNotEmpty) {
       request.add(body);
     }
