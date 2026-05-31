@@ -21,6 +21,22 @@ void main() {
     expect(config.auth, isA<BasicAuthConfig>());
   });
 
+  test('prefers explicit S3 region over Lambda region', () {
+    final config = AppConfig.fromEnvironment(
+      environment: {
+        'AWS_REGION': 'us-east-1',
+        'S3_REGION': 'us-west-2',
+        'S3_BUCKET': 'bucket',
+        'S3_PREFIX': 'docs/',
+        'AUTH_MODE': 'basic',
+        'AUTH_USERNAME': 'alice',
+        'AUTH_PASSWORD': 'secret',
+      },
+    );
+
+    expect(config.awsRegion, 'us-west-2');
+  });
+
   test('rejects unsupported auth mode', () {
     expect(
       () => AppConfig.fromEnvironment(

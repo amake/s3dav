@@ -26,7 +26,7 @@ final class AppConfig {
     };
 
     return AppConfig(
-      awsRegion: _firstPresent(env, const ['AWS_REGION', 'S3_REGION']),
+      awsRegion: _firstPresent(env, const ['S3_REGION', 'AWS_REGION']),
       s3Bucket: _require(env, 'S3_BUCKET'),
       s3Prefix: _normalizePrefix(_require(env, 'S3_PREFIX')),
       auth: auth,

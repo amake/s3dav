@@ -18,6 +18,8 @@ Parameters:
     Default: ''
   S3Bucket:
     Type: String
+  S3Region:
+    Type: String
   S3Prefix:
     Type: String
   AuthUsername:
@@ -72,7 +74,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          AWS_REGION: !Ref AWS::Region
+          S3_REGION: !Ref S3Region
           S3_BUCKET: !Ref S3Bucket
           S3_PREFIX: !Ref S3Prefix
           AUTH_MODE: basic
