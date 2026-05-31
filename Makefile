@@ -92,6 +92,7 @@ deploy: upload
 		--stack-name $(stack_name) \
 		--template-file $(template) \
 		--capabilities CAPABILITY_NAMED_IAM \
+		--no-fail-on-empty-changeset \
 		--parameter-overrides \
 			ServiceName=$(service_name) \
 			ArtifactBucket=$(artifact_bucket) \
@@ -105,3 +106,16 @@ deploy: upload
 			AuthUsername=$(auth_username) \
 			AuthPassword=$(auth_password) \
 			MaxObjectSizeBytes=$(max_object_size_bytes)
+	$(MAKE) update-code
+
+.PHONY: update-code
+update-code:
+	@test -n "$(artifact_bucket)" || (echo "artifact_bucket is required" && exit 1)
+	@test -n "$(artifact_key)" || (echo "artifact_key is required" && exit 1)
+	@test -n "$(aws_region)" || (echo "aws_region is required" && exit 1)
+	@test -n "$(service_name)" || (echo "service_name is required" && exit 1)
+	aws $(aws_region_arg) lambda update-function-code \
+		--function-name $(service_name) \
+		--s3-bucket $(artifact_bucket) \
+		--s3-key $(artifact_key) \
+		--publish

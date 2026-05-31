@@ -137,4 +137,10 @@ Optional deploy variables:
 
 `make deploy` builds the ZIP, uploads it to `s3://<artifact_bucket>/<artifact_key>`, and runs `aws cloudformation deploy --region <aws_region>` against [infra/template.yaml](infra/template.yaml). The Lambda stack and API Gateway live in `aws_region`; object reads and writes are signed for `s3_region`.
 
+When only code changes, CloudFormation may report no stack changes because the artifact S3 key is unchanged. `make deploy` still refreshes the Lambda code by calling `aws lambda update-function-code` after the stack deployment step. To update only the Lambda payload without touching the stack, run:
+
+```sh
+make upload update-code
+```
+
 If DNS is managed outside this stack, create a DNS record for `domain_name` that points at the `CustomDomainTarget` stack output. For a subdomain such as `dav.example.com`, use a `CNAME` record. If your DNS provider supports alias-style records at the zone apex, use `CustomDomainTarget` plus `CustomDomainHostedZoneId`.
